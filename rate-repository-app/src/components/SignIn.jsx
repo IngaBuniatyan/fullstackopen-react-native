@@ -1,7 +1,10 @@
 import { useFormik } from 'formik';
+import { useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { useNavigate } from 'react-router-native';
 import * as yup from 'yup';
 
+import useSignIn from '../hooks/useSignIn';
 import theme from '../theme';
 import Text from './Text';
 
@@ -29,6 +32,10 @@ const styles = StyleSheet.create({
     color: theme.colors.error,
     marginTop: 4,
   },
+  submitError: {
+    color: theme.colors.error,
+    marginBottom: 12,
+  },
   button: {
     alignItems: 'center',
     backgroundColor: theme.colors.primary,
@@ -51,11 +58,22 @@ const validationSchema = yup.object().shape({
 });
 
 const SignIn = () => {
+  const [signIn] = useSignIn();
+  const navigate = useNavigate();
+  const [submitError, setSubmitError] = useState(null);
+
   const formik = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: async (values) => {
+      setSubmitError(null);
+
+      try {
+        await signIn(values);
+        navigate('/');
+      } catch (error) {
+        setSubmitError(error.message);
+      }
     },
   });
 
@@ -98,8 +116,11 @@ const SignIn = () => {
         )}
       </View>
 
+      {submitError && <Text style={styles.submitError}>{submitError}</Text>}
+
       <Pressable
         accessibilityRole="button"
+        disabled={formik.isSubmitting}
         onPress={formik.handleSubmit}
         style={styles.button}
         testID="signin-button"

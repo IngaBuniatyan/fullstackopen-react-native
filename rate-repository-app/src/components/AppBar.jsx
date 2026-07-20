@@ -1,7 +1,10 @@
+import { useApolloClient, useQuery } from '@apollo/client/react';
 import Constants from 'expo-constants';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { Link } from 'react-router-native';
+import { Link, useNavigate } from 'react-router-native';
 
+import { ME } from '../graphql/queries';
+import useAuthStorage from '../hooks/useAuthStorage';
 import theme from '../theme';
 import Text from './Text';
 
@@ -23,29 +26,66 @@ const styles = StyleSheet.create({
   },
 });
 
-const AppBarTab = ({ children, to }) => (
-  <Pressable>
-    <Link to={to} underlayColor="transparent">
-      <View style={styles.tab}>
-        <Text fontWeight="bold" style={styles.tabText}>
-          {children}
-        </Text>
-      </View>
-    </Link>
-  </Pressable>
+const AppBarTabText = ({ children }) => (
+  <Text fontWeight="bold" style={styles.tabText}>
+    {children}
+  </Text>
 );
 
-const AppBar = () => (
-  <View style={styles.container}>
-    <ScrollView
-      contentContainerStyle={styles.tabs}
-      horizontal
-      showsHorizontalScrollIndicator={false}
-    >
-      <AppBarTab to="/">Repositories</AppBarTab>
-      <AppBarTab to="/signin">Sign in</AppBarTab>
-    </ScrollView>
-  </View>
-);
+const AppBarTab = ({ children, onPress, testID, to }) =>
+  to ? (
+    <Pressable>
+      <Link
+        style={styles.tab}
+        testID={testID}
+        to={to}
+        underlayColor="transparent"
+      >
+        <AppBarTabText>{children}</AppBarTabText>
+      </Link>
+    </Pressable>
+  ) : (
+    <Pressable onPress={onPress} style={styles.tab} testID={testID}>
+      <AppBarTabText>{children}</AppBarTabText>
+    </Pressable>
+  );
+
+const AppBar = () => {
+  const { data } = useQuery(ME, {
+    fetchPolicy: 'cache-and-network',
+  });
+  const authStorage = useAuthStorage();
+  const apolloClient = useApolloClient();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await authStorage.removeAccessToken();
+    await apolloClient.resetStore();
+    navigate('/');
+  };
+
+  return (
+    <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.tabs}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+      >
+        <AppBarTab testID="repositories-tab" to="/">
+          Repositories
+        </AppBarTab>
+        {data?.me ? (
+          <AppBarTab onPress={handleSignOut} testID="signout-tab">
+            Sign out
+          </AppBarTab>
+        ) : (
+          <AppBarTab testID="signin-tab" to="/signin">
+            Sign in
+          </AppBarTab>
+        )}
+      </ScrollView>
+    </View>
+  );
+};
 
 export default AppBar;
