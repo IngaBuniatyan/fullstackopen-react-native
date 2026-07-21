@@ -75,13 +75,26 @@ const AppBar = () => {
           Repositories
         </AppBarTab>
         {data?.me ? (
-          <AppBarTab onPress={handleSignOut} testID="signout-tab">
-            Sign out
-          </AppBarTab>
+          <>
+            <AppBarTab testID="create-review-tab" to="/create-review">
+              Create a review
+            </AppBarTab>
+            <AppBarTab testID="my-reviews-tab" to="/my-reviews">
+              My reviews
+            </AppBarTab>
+            <AppBarTab onPress={handleSignOut} testID="signout-tab">
+              Sign out
+            </AppBarTab>
+          </>
         ) : (
-          <AppBarTab testID="signin-tab" to="/signin">
-            Sign in
-          </AppBarTab>
+          <>
+            <AppBarTab testID="signin-tab" to="/signin">
+              Sign in
+            </AppBarTab>
+            <AppBarTab testID="signup-tab" to="/signup">
+              Sign up
+            </AppBarTab>
+          </>
         )}
       </ScrollView>
     </View>

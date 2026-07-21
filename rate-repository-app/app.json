@@ -24,6 +24,18 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "24a5f78f-9963-4f95-ad2c-fd764eee3f05"
+      }
+    },
+    "owner": "inga324",
+    "updates": {
+      "url": "https://u.expo.dev/24a5f78f-9963-4f95-ad2c-fd764eee3f05"
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
     }
   }
 }

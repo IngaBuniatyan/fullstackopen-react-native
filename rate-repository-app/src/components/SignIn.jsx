@@ -57,24 +57,11 @@ const validationSchema = yup.object().shape({
   password: yup.string().required('Password is required'),
 });
 
-const SignIn = () => {
-  const [signIn] = useSignIn();
-  const navigate = useNavigate();
-  const [submitError, setSubmitError] = useState(null);
-
+export const SignInContainer = ({ onSubmit, submitError }) => {
   const formik = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: async (values) => {
-      setSubmitError(null);
-
-      try {
-        await signIn(values);
-        navigate('/');
-      } catch (error) {
-        setSubmitError(error.message);
-      }
-    },
+    onSubmit,
   });
 
   const usernameHasError =
@@ -131,6 +118,25 @@ const SignIn = () => {
       </Pressable>
     </View>
   );
+};
+
+const SignIn = () => {
+  const [signIn] = useSignIn();
+  const navigate = useNavigate();
+  const [submitError, setSubmitError] = useState(null);
+
+  const onSubmit = async (values) => {
+    setSubmitError(null);
+
+    try {
+      await signIn(values);
+      navigate('/');
+    } catch (error) {
+      setSubmitError(error.message);
+    }
+  };
+
+  return <SignInContainer onSubmit={onSubmit} submitError={submitError} />;
 };
 
 export default SignIn;

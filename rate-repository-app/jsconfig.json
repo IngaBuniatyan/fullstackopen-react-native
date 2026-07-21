@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "checkJs": false,
+    "jsx": "react-jsx",
+    "types": ["jest"]
+  },
+  "exclude": ["node_modules"]
+}
